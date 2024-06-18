@@ -55,7 +55,6 @@ class filter_ubicast extends moodle_text_filter {
      * @return string the HTML content after the filtering has been applied.
      */
     public function filter($text, array $options = array()) {
-
         if (!is_string($text)) {
             // Non string data can not be filtered anyway.
             return $text;
@@ -65,12 +64,23 @@ class filter_ubicast extends moodle_text_filter {
             return $text;
         }
 
-        $pattern = '/<img[^>]*class="atto_ubicast courseid_([0-9]+)_mediaid_([a-z0-9]+)"[^>]*style="([^"]*)"[^>]*>/';
+        $coursectx = $this->context->get_course_context(false);
+        if (!$coursectx) {
+            return $text;
+        }
+        $courseid = $coursectx->instanceid;
 
-        $text = preg_replace_callback($pattern, [
-                'filter_ubicast',
-                'get_iframe_url'
-        ], $text);
+        $text = preg_replace(
+            '/atto_ubicast (?:courseid_[0-9]+_)?mediaid/',
+            'atto_ubicast courseid_'.$courseid.'_mediaid',
+            $text
+        );
+
+        $text = preg_replace_callback(
+            '/<img[^>]*class="atto_ubicast courseid_([0-9]+)_mediaid_([a-z0-9]+)"[^>]*style="([^"]*)"[^>]*>/',
+            ['filter_ubicast', 'get_iframe_url'],
+            $text
+        );
 
         return $text;
     }
