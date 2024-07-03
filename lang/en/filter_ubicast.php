@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Atto text editor integration version file.
+ * Strings for component "filter_ubicast".
  *
  * @package    filter_ubicast
  * @copyright  2021 UbiCast {@link https://www.ubicast.eu}
@@ -26,3 +26,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['filtername'] = 'Ad-hoc filter for UbiCast Atto plugin';
+$string['createplaylists'] = 'Create playlists';
+$string['createplaylists_desc'] = 'If enabled, whenever multiple media are embedded one after another, a playlist will be displayed. <br/>If some content is present between media, no playlist will be displayed.';
+$string['defaultapitimeoutsecs'] = 'API default timeout [s]';
+$string['defaultapitimeoutsecs_desc'] = 'Timeout for default API calls, in seconds.';
+$string['apikey'] = 'API key';
+$string['apikey_desc'] = 'API key to get media info from Nudgis Media Server.<br/> This is necessary to get the title correctly on the playlist tabs. <br/><strong>Note:</strong> The user linked to the API key must have the permission to access all media of the Nudgis service.';
+$string['apilocation'] = 'API URL';
+$string['apilocation_desc'] = 'Base URL of the Nudgis service API. For example: <code>https://your-nudgis.portal/api/v2/</code>.';
+$string['filtersettings'] = 'Feature: display as playlist';
+$string['filtersettings_desc'] = 'The other settings are only required if the feature is enabled, and you wish to display the videos titles on each of the playlist tabs. If you ignore these settings, the playlist tabs will only display numbers in sequence, i.e. <code>1., 2., ...</code>.';
+$string['privacy:metadata'] = 'The UbiCast filter plugin does not store any personal data.';
