@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Module to handle requests on Nudgis API.
+ *
  * @package    filter_ubicast
  * @copyright  2024 Université de Laussanne {@link https://www.unil.ch}
  * @author     Nicolas Dunand <nicolas.dunand@unil.ch>
@@ -24,6 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * API calling class.
+ */
 class filter_ubicast_apicall {
 
     /**
@@ -37,15 +41,15 @@ class filter_ubicast_apicall {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    static function sendRequest($path, $params = [], $timeout = 0, $method = 'GET') {
+    public static function send_request($path, $params = [], $timeout = 0, $method = 'GET') {
 
         if (!get_config('filter_ubicast', 'apilocation') || !get_config('filter_ubicast', 'apikey')) {
             return null;
         }
 
         $apikey = get_config('filter_ubicast', 'apikey');
-        $request_url = trim(get_config('filter_ubicast', 'apilocation'), '/') . '/' . trim($path,
-                        '/') . '/' . '?api_key=' . $apikey;
+        $url = trim(get_config('filter_ubicast', 'apilocation'), '/') .
+            '/' . trim($path, '/') . '/' . '?api_key=' . $apikey;
         if (!$timeout) {
             $timeout = get_config('filter_ubicast', 'defaultapitimeoutsecs');
         }
@@ -53,32 +57,32 @@ class filter_ubicast_apicall {
 
         if ($method === 'GET') {
             foreach ($params as $key => $value) {
-                $request_url .= '&' . $key . '=' . $value;
+                $url .= '&' . $key . '=' . $value;
             }
         }
 
         libxml_use_internal_errors(true);
 
-        $curl_request = curl_init();
-        curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl_request, CURLOPT_CUSTOMREQUEST, $method);
+        $req = curl_init();
+        curl_setopt($req, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($req, CURLOPT_CUSTOMREQUEST, $method);
         if ($method === 'POST') {
-            curl_setopt($curl_request, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($req, CURLOPT_POSTFIELDS, $params);
         }
-        curl_setopt($curl_request, CURLOPT_TIMEOUT_MS, $timeoutms);
-        curl_setopt($curl_request, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($req, CURLOPT_TIMEOUT_MS, $timeoutms);
+        curl_setopt($req, CURLOPT_SSL_VERIFYPEER, true);
 
-        curl_setopt($curl_request, CURLOPT_URL, $request_url);
+        curl_setopt($req, CURLOPT_URL, $url);
 
-        $output = curl_exec($curl_request);
-        $curl_errno = curl_errno($curl_request); // 0 if fine
-        $response_details = curl_getinfo($curl_request);
+        $output = curl_exec($req);
+        $errno = curl_errno($req); // 0 if fine
+        curl_getinfo($req);
 
-        curl_close($curl_request);
+        curl_close($req);
 
         if ($output === false) {
-            if ($curl_errno) {
-                mtrace('CURL REQUEST ERROR ' . $curl_errno . ' while calling ' . $path . ' ' . json_encode($params));
+            if ($errno) {
+                mtrace('CURL REQUEST ERROR ' . $errno . ' while calling ' . $path . ' ' . json_encode($params));
             }
 
             return false;
@@ -86,8 +90,7 @@ class filter_ubicast_apicall {
 
         try {
             $return = json_decode($output);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             print_error('api_fail', 'exam', null, $e->getMessage() . $e->getCode());
 
             return false;
@@ -95,6 +98,4 @@ class filter_ubicast_apicall {
 
         return $return;
     }
-
 }
-

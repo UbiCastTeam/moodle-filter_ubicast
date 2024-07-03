@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Atto text editor integration version file.
+ * Main file for component "filter_ubicast".
  *
  * @package    filter_ubicast
  * @copyright  2021 UbiCast {@link https://www.ubicast.eu}
@@ -25,29 +25,25 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Filtering class.
+ */
 class filter_ubicast extends moodle_text_filter {
 
-    protected $pattern;
-
-
     /**
-     * Setup page with filter requirements and other prepare stuff.
-     *
-     * @param moodle_page $page The page we are going to add requirements to.
-     * @param context $context The context which contents are going to be filtered.
+     * @var the regular expression to extract media inserted with "atto_ubicast".
      */
-    public function setup($page, $context) {
-        $this->pattern = '/<img[^>]*class="atto_ubicast courseid_([0-9]+)_mediaid_([a-z0-9]+)"[^>]*style="([^"]*)"[^>]*>/';
-    }
-
+    protected $pattern = '/<img[^>]*class="atto_ubicast courseid_([0-9]+)_mediaid_([a-z0-9]+)"[^>]*style="([^"]*)"[^>]*>/';
 
     /**
+     * Apply the filter on a text.
+     *
      * @param string $text    some HTML content to process.
      * @param array  $options options passed to the filters.
      *
      * @return string the HTML content after the filtering has been applied.
      */
-    public function filter($text, array $options = array()) {
+    public function filter($text, array $options = []) {
         if (!is_string($text)) {
             // Non string data can not be filtered anyway.
             return $text;
@@ -72,7 +68,7 @@ class filter_ubicast extends moodle_text_filter {
         // Embed several consecutive Ubicast videos as a playlist, if the feature is activated.
         $isplaylist = false;
 
-        if (get_config('filter_ubicast', 'createontheflyplaylists')) {
+        if (get_config('filter_ubicast', 'createplaylists')) {
             $count = substr_count($text, 'class="atto_ubicast');
             if ($count > 1) {
                 list($isplaylist, $text) = self::embedmany($text);
@@ -80,13 +76,20 @@ class filter_ubicast extends moodle_text_filter {
         }
         if (!$isplaylist) {
             $text = preg_replace_callback(
-                $this->pattern, ['filter_ubicast', 'get_iframe_url'], $text
+                $this->pattern, ['filter_ubicast', 'get_iframe_html'], $text
             );
         }
 
         return $text;
     }
 
+    /**
+     * Function to replace a media image tag with an iframe tag.
+     *
+     * @param array  $matches the regular expression match array.
+     *
+     * @return string the HTML content for the iframe.
+     */
     private static function get_iframe_html($matches) {
         global $CFG;
 
@@ -108,13 +111,20 @@ class filter_ubicast extends moodle_text_filter {
         return $iframe;
     }
 
+    /**
+     * Create playlist rendering.
+     *
+     * @param string $text    some HTML content to process.
+     *
+     * @return string the HTML content including the playlist.
+     */
     private function embedmany($text) {
         global $DB, $PAGE;
 
         static $jsinserted = 0;
         static $playlistno = 0;
 
-        $entries = array();
+        $entries = [];
         $nextstop = 0;
 
         while (strpos($text, '<img class="atto_ubicast', $nextstop) !== false) {
@@ -130,10 +140,10 @@ class filter_ubicast extends moodle_text_filter {
                     // Check that there is no actual text content in between. If there is, it's not to be a playlist.
                     $this->isplaylist = false;
 
-                    return array(
+                    return [
                         false,
-                        $text
-                    );
+                        $text,
+                    ];
                 }
             }
             $nextstop = strpos($text, '>', $nextstart) + 1; // Note: +1 to dismiss the matched '>'.
@@ -193,7 +203,7 @@ EOF;
             $title = '';
             $oid = preg_replace('/^.*mediaid_([^"]+)".*$/', '\1', $entryimg);
             try {
-                $media = \filter_ubicast_apicall::sendRequest('medias/get', ['oid' => $oid]);
+                $media = \filter_ubicast_apicall::send_request('medias/get', ['oid' => $oid]);
                 if (isset($media->info) && isset($media->info->title)) {
                     $title = $media->info->title;
                 }
@@ -204,21 +214,22 @@ EOF;
             $tabs .= '<a href="#" id="filter_ubicast_playlisttab_' . $playlistno . '_' . $itemno . '" ' .
                 'class="filter_ubicast_playlist_tab_' . $playlistno . ' ' . $selectedclass . '" ' .
                 'onclick="filter_ubicast_playlisttab_settab_' . $playlistno .
-                '(' . $itemno . ', \'filter_ubicast_playlistitem_' . $playlistno . '_' . $itemno . '\', \'' . base64_encode(preg_replace_callback(
-                    $this->pattern, ['filter_ubicast', 'get_iframe_html'], $entryimg)
-                ) . '\'); return false;"><ol start="' . $itemno . '"><li>' . $title . '</li></ol></a>';
+                '(' . $itemno . ', \'filter_ubicast_playlistitem_' . $playlistno . '_' . $itemno . '\', \'' .
+                base64_encode(preg_replace_callback($this->pattern, ['filter_ubicast', 'get_iframe_html'], $entryimg)) .
+                '\'); return false;"><ol start="' . $itemno . '"><li>' . $title . '</li></ol></a>';
 
             if ($itemno === 1) {
                 // Load the fill iframe for the first player only.
-                $currentplayer = '<div id="filter_ubicast_playlistitem_' . $playlistno . '_' . $itemno . '" class="filter_ubicast_playlist_player_' . $playlistno . ' ' . $hiddenclass . '" >';
+                $currentplayer = '<div id="filter_ubicast_playlistitem_' . $playlistno . '_' . $itemno . '" ' .
+                    'class="filter_ubicast_playlist_player_' . $playlistno . ' ' . $hiddenclass . '" >';
                 $currentplayer .= preg_replace_callback(
                     $this->pattern, ['filter_ubicast', 'get_iframe_html'], $entryimg
                 );
                 $currentplayer .= '</div>';
-            }
-            else {
+            } else {
                 // For other player, lazy-load using the preview image.
-                $currentplayer = '<div id="filter_ubicast_playlistitem_' . $playlistno . '_' . $itemno . '" class="filter_ubicast_playlist_player_' . $playlistno . ' filter_ubicast_player_lazy ' . $hiddenclass . '" >';
+                $currentplayer = '<div id="filter_ubicast_playlistitem_' . $playlistno . '_' . $itemno . '" ' .
+                    'class="filter_ubicast_playlist_player_' . $playlistno . ' filter_ubicast_player_lazy ' . $hiddenclass . '" >';
                 $currentplayer .= $entryimg;
                 $currentplayer .= '</div>';
             }
@@ -238,9 +249,9 @@ $playlistjs
 </div>
 EOF;
 
-        return array(
+        return [
             true,
-            substr($text, 0, $start) . $playlisttext . substr($text, $nextstop)
-        );
+            substr($text, 0, $start) . $playlisttext . substr($text, $nextstop),
+        ];
     }
 }
