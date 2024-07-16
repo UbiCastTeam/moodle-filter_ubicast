@@ -24,3 +24,10 @@ git clone https://github.com/UbiCastTeam/moodle-filter_ubicast ubicast
 First, you need to turn on the filter in the `/admin/filters.php` page of your Moodle instance.
 
 Then, you need to enable the `<img>` tag insertion in the `atto_ubicast` plugin. This can be done in the `atto_ubicast` plugin settings: `/admin/settings.php?section=atto_ubicast_settings`.
+
+
+## Feature: Rendering as playlist
+
+Optionally, this plugin can render multiple media in the same text using a playlist: a block with the player on the left and the list of media on the right. If some content is present between media, no playlist will be rendered.
+
+This feature is disabled by default and can be enabled in the plugin settings: `/admin/settings.php?section=filtersettingubicast`.
