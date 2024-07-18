@@ -96,10 +96,10 @@ class filter_ubicast extends moodle_text_filter {
         $courseid = $matches[1];
         $mediaid = $matches[2];
         $style = $matches[3];
-        if (!str_contains($style, 'width')) {
+        if (strpos($style, 'width') === false) {
             $style = 'width: 100%;' . $style;
         }
-        if (!str_contains($style, 'height')) {
+        if (strpos($style, 'height') === false) {
             $style = 'height: 300px;' . $style;
         }
         $style = 'background-color: #ddd;' . $style;
