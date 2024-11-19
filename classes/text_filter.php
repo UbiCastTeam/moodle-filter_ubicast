@@ -14,21 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace filter_ubicast;
+
 /**
- * Main file for component "filter_ubicast".
+ * Filter converting images inserted by the "atto_ubicast" plugin to iframes
  *
  * @package    filter_ubicast
  * @copyright  2021 UbiCast {@link https://www.ubicast.eu}
  * @author     Nicolas Dunand <nicolas.dunand@unil.ch>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Filtering class.
- */
-class filter_ubicast extends moodle_text_filter {
+class text_filter extends \core_filters\text_filter {
 
     /**
      * @var the regular expression to extract media inserted with "atto_ubicast".
@@ -76,7 +72,7 @@ class filter_ubicast extends moodle_text_filter {
         }
         if (!$isplaylist) {
             $text = preg_replace_callback(
-                $this->pattern, ['filter_ubicast', 'get_iframe_html'], $text
+                $this->pattern, ['filter_ubicast\text_filter', 'get_iframe_html'], $text
             );
         }
 
@@ -138,8 +134,6 @@ class filter_ubicast extends moodle_text_filter {
                 $textinbetween = trim(str_replace('&nbsp;', '', strip_tags(substr($text, $nextstop, ($nextstart - $nextstop)))));
                 if (strlen($textinbetween) > 1) {
                     // Check that there is no actual text content in between. If there is, it's not to be a playlist.
-                    $this->isplaylist = false;
-
                     return [
                         false,
                         $text,
@@ -151,7 +145,6 @@ class filter_ubicast extends moodle_text_filter {
             $entries[] = $entry;
         }
 
-        $this->isplaylist = true;
         $playlistno++;
         $jsinserted = 0;
 
@@ -215,7 +208,7 @@ EOF;
                 'class="filter_ubicast_playlist_tab_' . $playlistno . ' ' . $selectedclass . '" ' .
                 'onclick="filter_ubicast_playlisttab_settab_' . $playlistno .
                 '(' . $itemno . ', \'filter_ubicast_playlistitem_' . $playlistno . '_' . $itemno . '\', \'' .
-                base64_encode(preg_replace_callback($this->pattern, ['filter_ubicast', 'get_iframe_html'], $entryimg)) .
+                base64_encode(preg_replace_callback($this->pattern, ['filter_ubicast\text_filter', 'get_iframe_html'], $entryimg)) .
                 '\'); return false;"><ol start="' . $itemno . '"><li>' . $title . '</li></ol></a>';
 
             if ($itemno === 1) {
@@ -223,7 +216,7 @@ EOF;
                 $currentplayer = '<div id="filter_ubicast_playlistitem_' . $playlistno . '_' . $itemno . '" ' .
                     'class="filter_ubicast_playlist_player_' . $playlistno . ' ' . $hiddenclass . '" >';
                 $currentplayer .= preg_replace_callback(
-                    $this->pattern, ['filter_ubicast', 'get_iframe_html'], $entryimg
+                    $this->pattern, ['filter_ubicast\text_filter', 'get_iframe_html'], $entryimg
                 );
                 $currentplayer .= '</div>';
             } else {
