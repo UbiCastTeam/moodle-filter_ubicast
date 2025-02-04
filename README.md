@@ -1,6 +1,6 @@
-# Ad-hoc filter for UbiCast Nudgis Atto plugin
+# Filter for UbiCast Nudgis Atto & TinyMCE plugins
 
-This filter alleviates the problem which arises when `atto_ubicast` tries to inject an `<iframe>` HTML tag directly into text fields. This works for teachers and "trusted users" but not all users and not in all locations. Optionally, the `atto_ubicast` cans insert an `<img>` HTML tag instead. This tag's usage is unrestricted and is then turned into an iframe at the rendering stage by this plugin.
+This filter alleviates the problem which arises when the text editor tries to inject an `<iframe>` HTML tag directly into text fields. This works for teachers and "trusted users" but not all users and not in all locations. Optionally, the `atto_ubicast` and `tiny_ubicast` plugins can insert an `<img>` HTML tag instead. This tag's usage is unrestricted and is then turned into an iframe at the rendering stage by this plugin.
 
 
 ## Installation
@@ -23,7 +23,7 @@ git clone https://github.com/UbiCastTeam/moodle-filter_ubicast ubicast
 
 First, you need to turn on the filter in the `/admin/filters.php` page of your Moodle instance.
 
-Then, you need to enable the `<img>` tag insertion in the `atto_ubicast` plugin. This can be done in the `atto_ubicast` plugin settings: `/admin/settings.php?section=atto_ubicast_settings`.
+Then, you need to enable the `<img>` tag insertion in the `atto_ubicast` and/or in the `tiny_ubicast` plugin settings.
 
 
 ## Feature: Rendering as playlist
