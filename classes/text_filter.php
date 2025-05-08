@@ -17,7 +17,7 @@
 namespace filter_ubicast;
 
 /**
- * Filter converting images inserted by the "atto_ubicast" plugin to iframes
+ * Filter converting images inserted by the "(atto|tiny)_ubicast" plugin to iframes
  *
  * @package    filter_ubicast
  * @copyright  2021 UbiCast {@link https://www.ubicast.eu}

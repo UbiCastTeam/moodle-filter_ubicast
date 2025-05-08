@@ -91,7 +91,7 @@ class filter_ubicast_apicall {
         try {
             $return = json_decode($output);
         } catch (Exception $e) {
-            print_error('api_fail', 'exam', null, $e->getMessage() . $e->getCode());
+            throw new \moodle_exception('api_fail', 'exam', null, $e->getMessage() . $e->getCode());
 
             return false;
         }
