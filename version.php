@@ -31,6 +31,5 @@ $plugin->component = 'filter_ubicast';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '3.2';
 $plugin->dependencies = [
-    'atto_ubicast' => 2024061800, // To have atto_ubicast offering the atto_ubicast/usefilter setting.
     'mod_ubicast'  => 2024111900, // To have mod_ubicast/media_selector.js use input[name=mediaimg].
 ];

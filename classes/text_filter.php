@@ -100,7 +100,9 @@ class text_filter extends \core_filters\text_filter {
         }
         $style = 'background-color: #ddd;' . $style;
 
-        $url = $CFG->wwwroot . '/lib/editor/atto/plugins/ubicast/view.php?course=' . $courseid . '&video=' . $mediaid;
+        // Check whether tiny_ubicast or atto_ubicast is installed.
+        $editor = file_exists($CFG->dirroot . '/lib/editor/tiny/plugins/ubicast/view.php') ? 'tiny' : 'atto';
+        $url = $CFG->wwwroot . '/lib/editor/' . $editor . '/plugins/ubicast/view.php?course=' . $courseid . '&video=' . $mediaid;
         $iframe = '<iframe class="nudgis-iframe" src="' . $url . '" ' . 'style="' . $style . '" ' .
             'frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen" loading="lazy"></iframe>';
 
