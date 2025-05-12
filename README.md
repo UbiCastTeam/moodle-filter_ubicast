@@ -18,6 +18,8 @@ cd moodle/filter
 git clone https://github.com/UbiCastTeam/moodle-filter_ubicast ubicast
 ```
 
+The `tiny_ubicast` plugin is required to handle the rendering of inserted content.
+
 
 ## Activation
 
