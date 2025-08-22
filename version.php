@@ -25,11 +25,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2025051200;
+$plugin->version = 2025082200;
 $plugin->requires = 2024100700; // Moodle 4.5.
 $plugin->component = 'filter_ubicast';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.3';
+$plugin->release = '3.4';
 $plugin->dependencies = [
     'mod_ubicast'  => 2024111900, // To have mod_ubicast/media_selector.js use input[name=mediaimg].
     'tiny_ubicast'  => 2025043000, // To handle the rendering of inserted content.

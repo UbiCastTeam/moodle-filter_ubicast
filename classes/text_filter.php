@@ -29,7 +29,7 @@ class text_filter extends \core_filters\text_filter {
     /**
      * @var the regular expression to extract media inserted with "atto_ubicast".
      */
-    protected $pattern = '/<img[^>]*class="atto_ubicast courseid_([0-9]+)_mediaid_([a-z0-9]+)"[^>]*style="([^"]*)"[^>]*>/';
+    protected $pattern = '/<img[^>]*class="atto_ubicast courseid_([0-9]+)_mediaid_([a-z0-9]+)[^"]*"[^>]*style="([^"]*)"[^>]*>/';
 
     /**
      * Apply the filter on a text.
