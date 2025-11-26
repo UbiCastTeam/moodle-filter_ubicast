@@ -194,14 +194,16 @@ EOF;
             // Find out the tab's name – only way seems to use and API call.
             // We'll cheat and use \block_ubicastlife_apicall as it's available.
             $title = '';
-            $oid = preg_replace('/^.*mediaid_([^"]+)".*$/', '\1', $entryimg);
-            try {
-                $media = \filter_ubicast_apicall::send_request('medias/get', ['oid' => $oid]);
-                if (isset($media->info) && isset($media->info->title)) {
-                    $title = $media->info->title;
+            $oid = preg_replace('/^.*atto_ubicast courseid_[0-9]+_mediaid_([cvlp][a-z0-9]+).*$/', '\1', $entryimg);
+            if ($oid && $oid != $entryimg) {
+                try {
+                    $media = \filter_ubicast_apicall::send_request('medias/get', ['oid' => $oid]);
+                    if (isset($media->info) && isset($media->info->title)) {
+                        $title = $media->info->title;
+                    }
+                } catch (Exception $exception) {
+                    // Leave it.
                 }
-            } catch (Exception $exception) {
-                // Leave it.
             }
 
             $tabs .= '<a href="#" id="filter_ubicast_playlisttab_' . $playlistno . '_' . $itemno . '" ' .
